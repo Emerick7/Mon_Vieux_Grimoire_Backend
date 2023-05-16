@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://Kirem7:Boureaux7mdb@mon-vieux-grimoire.y9wdgmx.m
 
 const app = express();
 
-app.use(express.json);
+//app.use(express.json);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,6 +21,9 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json());
 
