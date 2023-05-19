@@ -69,8 +69,8 @@ exports.getAllBooks = (req, res, next) => {
 };
 
 exports.getBestRatingBooks = (req, res, next) => {
-    Book.find().sort({'averageRating':-1})
-        .then(books => res.status(200).json(books[0, 1, 2]))
+    Book.find().sort({ averageRating: -1 })
+        .then(books => res.status(200).json([books[0], books[1], books[2]]))
         .catch(error => res.status(400).json({ error }));
 };
 
@@ -79,9 +79,17 @@ exports.postRatingBook = (req, res, next) => {
     ratingObject.grade = ratingObject.rating;
     delete ratingObject.rating;
 
-    Book.updateOne({ _id: req.params.id }, {$push: {ratings: ratingObject}})
-        .then(() => res.status(200).json({ message: 'Rating sent'}))
-        .catch(error => res.status(401).json({ error }));
+    Book.findOne({ _id: req.params.id })
+        .then(book => {
+            if(book.ratings.userId === req.auth.userId) {
+                res.status(401).json({ message: 'Already rated' });
+            } else {
+                Book.updateOne({ _id: req.params.id }, {$push: {ratings: ratingObject}})
+                    .then(() => res.status(200).json({ message: 'Rating sent'}))
+                    .catch(error => res.status(401).json({ error }));
+            }
+        })
+        .catch((error) => res.status(400).json({ error }));
 
     Book.findOne({ _id: req.params.id })
         .then((book) => {
