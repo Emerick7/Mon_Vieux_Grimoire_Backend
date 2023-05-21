@@ -83,7 +83,7 @@ exports.postRatingBook = (req, res, next) => {
         .then(book => {
             const userHaveNotRated = book.ratings.every(rating => rating.userId !== req.auth.userId)
             if(userHaveNotRated === false) {
-                res.status(401).json({ message: 'Already rated' });
+                res.status(401).json(book);
                 return
             } else {
                 Book.findOneAndUpdate({ _id: req.params.id }, {$push: {ratings: ratingObject}})
@@ -95,8 +95,8 @@ exports.postRatingBook = (req, res, next) => {
                         
                         averageRates /= book.ratings.length;
 
-                        Book.updateOne({ _id: req.params.id }, {$set: {averageRating: averageRates}, _id: req.params.id})
-                            .then(() => res.status(201).json({ message: 'Rating sent and average Book rating updated'}))
+                        Book.findOneAndUpdate({ _id: req.params.id }, {$set: {averageRating: averageRates}, _id: req.params.id}, {new: true})
+                            .then((book) => res.status(201).json(book))
                             .catch(error => res.status(401).json({ error }));
                     })
                     .catch(error => res.status(401).json({ error }));
