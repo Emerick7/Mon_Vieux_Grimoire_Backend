@@ -81,7 +81,8 @@ exports.postRatingBook = (req, res, next) => {
 
     Book.findOne({ _id: req.params.id })
         .then(book => {
-            if(book.ratings.userId === req.auth.userId) {
+            const userHaveNotRated = book.ratings.every(rating => rating.userId !== req.auth.userId)
+            if(userHaveNotRated === false) {
                 res.status(401).json({ message: 'Already rated' });
                 return
             } else {
