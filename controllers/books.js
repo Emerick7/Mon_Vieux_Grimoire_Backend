@@ -9,7 +9,7 @@ exports.createBook = (req, res, next) => {
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${res.locals.newName}`
     });
 
     book.save()
@@ -20,7 +20,7 @@ exports.createBook = (req, res, next) => {
 exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${res.locals.newName}`
     } : { ...req.body };
 
     delete bookObject._userId;
@@ -94,6 +94,7 @@ exports.postRatingBook = (req, res, next) => {
                         };
                         
                         averageRates /= book.ratings.length;
+                        Math.round(averageRates);
 
                         Book.findOneAndUpdate({ _id: req.params.id }, {$set: {averageRating: averageRates}, _id: req.params.id}, {new: true})
                             .then((book) => res.status(201).json(book))

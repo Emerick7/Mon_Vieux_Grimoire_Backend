@@ -5,8 +5,8 @@ const router = express.Router();
 
 const booksControllers = require('../controllers/books');
 
-router.post('/', auth, multer, booksControllers.createBook);
-router.put('/:id', auth, multer, booksControllers.modifyBook);
+router.post('/', auth, multer.imageUploader.single('image'), multer.imgResize, booksControllers.createBook);
+router.put('/:id', auth, multer.imageUploader.single('image'), multer.imgResize, booksControllers.modifyBook);
 router.delete('/:id', auth, booksControllers.deleteBook);
 router.get('/bestrating', booksControllers.getBestRatingBooks);
 router.get('/:id', booksControllers.getOneBook);

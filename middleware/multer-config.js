@@ -1,4 +1,5 @@
 const multer = require('multer');
+const sharp = require('sharp');
 
 const MIME_TYPES = {
     'image/jpg': 'jpg',
@@ -6,15 +7,31 @@ const MIME_TYPES = {
     'image/png': 'png'
 };
 
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, 'images')
-    },
-    filename: (req, file, callback) => {
-        const name = file.originalname.split(' ').join('_');
-        const extension = MIME_TYPES[file.mimetype];
-        callback(null, name + Date.now() + '.' + extension);
+const storage = multer.memoryStorage();
+
+const filter = (req, file, cb) => {
+    if (file.mimetype.split("/")[0] === 'image') {
+        cb(null, true);
+    } else {
+        cb(new Error("Only images are allowed!"));
     }
+};
+
+exports.imageUploader = multer({
+    storage,
+    fileFilter: filter
 });
 
-module.exports = multer({ storage }).single('image');
+exports.imgResize = async (req, res, next) => {
+    const name = req.file.originalname.split(' ').join('_');
+    const extension = MIME_TYPES[req.file.mimetype];
+    const newName = name + Date.now() + '.' + extension;
+
+    const path = `./images/${newName}`;
+
+    await sharp(req.file.buffer)
+        .resize(207, 260)
+        .toFile(path);
+    res.locals.newName = newName;
+    next();
+};
