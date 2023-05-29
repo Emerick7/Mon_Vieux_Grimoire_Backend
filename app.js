@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -7,7 +8,10 @@ const path = require('path');
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://Kirem7:Boureaux7mdb@mon-vieux-grimoire.y9wdgmx.mongodb.net/?retryWrites=true&w=majority',
+const mongodbUser = process.env.MONGODB_USER;
+const mongodbPassword = process.env.MONGODB_PASSWORD;
+
+mongoose.connect(`mongodb+srv://${mongodbUser}:${mongodbPassword}@mon-vieux-grimoire.y9wdgmx.mongodb.net/?retryWrites=true&w=majority`,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
