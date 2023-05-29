@@ -23,15 +23,19 @@ exports.imageUploader = multer({
 });
 
 exports.imgResize = async (req, res, next) => {
-    const name = req.file.originalname.split(' ').join('_');
-    const extension = MIME_TYPES[req.file.mimetype];
-    const newName = name + Date.now() + '.' + extension;
+    if(req.file) {
+        const name = req.file.originalname.split(' ').join('_');
+        const extension = MIME_TYPES[req.file.mimetype];
+        const newName = name + Date.now() + '.' + extension;
 
-    const path = `./images/${newName}`;
+        const path = `./images/${newName}`;
 
-    await sharp(req.file.buffer)
-        .resize(207, 260)
-        .toFile(path);
-    res.locals.newName = newName;
-    next();
+        await sharp(req.file.buffer)
+            .resize(207, 260)
+            .toFile(path);
+        res.locals.newName = newName;
+        next();
+    } else {
+        next();
+    }
 };
